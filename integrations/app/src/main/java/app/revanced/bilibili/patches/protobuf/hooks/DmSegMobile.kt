@@ -4,7 +4,6 @@ import app.revanced.bilibili.patches.protobuf.MossHook
 import app.revanced.bilibili.settings.Settings
 import app.revanced.bilibili.utils.Utils
 import app.revanced.bilibili.utils.clearUnknownFields
-import app.revanced.bilibili.utils.maybeThailand
 import com.bapis.bilibili.community.service.dm.v1.DmColorfulType
 import com.bapis.bilibili.community.service.dm.v1.DmSegMobileReply
 import com.bapis.bilibili.community.service.dm.v1.DmSegMobileReq
@@ -23,12 +22,6 @@ object DmSegMobile : MossHook<DmSegMobileReq, DmSegMobileReply>() {
         reply: DmSegMobileReply?,
         error: MossException?
     ): DmSegMobileReply? {
-        if (reply != null && Settings.UnlockAreaLimit() && Settings.ThailandServer().isNotEmpty()) {
-            val epId = req.oid.toString()
-            val seasonId = req.pid.toString()
-            if (maybeThailand(seasonId, epId))
-                reply.clearElems()
-        }
         val noColorfulDanmaku = Settings.NoColorfulDanmaku()
         val timeAirborne = Settings.TimeAirborne()
         reply?.elemsList?.forEach { elem ->

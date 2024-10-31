@@ -1,8 +1,6 @@
 package app.revanced.bilibili.patches.protobuf.hooks
 
 import android.net.Uri
-import app.revanced.bilibili.api.BiliRoamingApi.getThailandSubtitles
-import app.revanced.bilibili.patches.okhttp.BangumiSeasonHook.bangumiInfoCache
 import app.revanced.bilibili.patches.okhttp.hooks.Subtitle
 import app.revanced.bilibili.patches.protobuf.MossHook
 import app.revanced.bilibili.settings.Settings
@@ -72,23 +70,6 @@ object DmView : MossHook<DmViewReq, DmViewReply>() {
     private fun addSubtitles(dmViewReq: DmViewReq, dmViewReply: DmViewReply?): DmViewReply {
         val result = dmViewReply ?: DmViewReply()
         val extraSubtitles = ArrayList<SubtitleItem>()
-        if (Settings.UnlockAreaLimit() && Settings.ThailandServer().isNotEmpty()) {
-            // when thailand, epId equals oid(cid), seasonId equals pid(aid)
-            val epId = dmViewReq.oid
-            val seasonId = dmViewReq.pid
-            if (maybeThailand(seasonId.toString(), epId.toString())) {
-                val subtitles = bangumiInfoCache[seasonId]?.get(epId)?.subtitles ?: run {
-                    val res = getThailandSubtitles(epId)?.toJSONObject()
-                    if (res != null && res.optInt("code") == 0) {
-                        res.optJSONObject("data")
-                            ?.optJSONArray("subtitles").orEmpty()
-                    } else JSONArray()
-                }
-                extraSubtitles.addAll(subtitles.toSubtitles())
-                result.closed = true
-                result.inputPlaceholder = "泰区禁止弹幕"
-            }
-        }
         if (Settings.AutoGenerateSubtitle()) {
             val subtitles = result.subtitle.subtitlesList + extraSubtitles
             if (subtitles.map { it.lan }.let { "zh-Hant" in it && "zh-CN" !in it }) {

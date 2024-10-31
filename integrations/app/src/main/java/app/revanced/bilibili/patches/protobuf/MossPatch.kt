@@ -34,9 +34,7 @@ object MossPatch {
         PlayHalfChannels,
         PlayURLPlayConf,
         PlayURLPlayConfEdit,
-        PlayURLPlayViewPGC,
         PlayURLPlayViewUGC,
-        PlayURLPlayViewUnite,
         Popular,
         ReplyDetailList,
         ReplyMainList,
@@ -44,7 +42,6 @@ object MossPatch {
         ReplySubjectDescription,
         ResourceTopActivity,
         SearchAll,
-        SearchByType,
         SearchDefaultWords,
         View,
         ViewContinuousPlay,
@@ -58,11 +55,6 @@ object MossPatch {
     )
 
     const val PLAY_VIEW_UNITE_API = "bilibili.app.playerunite.v1.Player/PlayViewUnite"
-
-    val fakeToPinkForUnlockAreaLimitApis = arrayOf(
-        "bilibili.pgc.gateway.player.v2.PlayURL/PlayView",
-        "bilibili.app.viewunite.v1.View/View",
-    )
 
     /**
      * @return [HookFlags.STOP_EXECUTION] to stop method execution and return null,
@@ -163,12 +155,7 @@ object MossPatch {
     @Keep
     @JvmStatic
     fun hookBeforeRequest(url: String, headers: ArrayList<Map.Entry<String, String>>): String {
-        if (Settings.UnlockAreaLimit() && Utils.isPlay()
-            && fakeToPinkForUnlockAreaLimitApis.any { url.endsWith(it) }
-        ) fakeClient(Client.Pink, headers)
-        else if (url.endsWith(PLAY_VIEW_UNITE_API)) {
-            if (Settings.UnlockAreaLimit() && Utils.isPlay())
-                fakeClient(Client.Pink, headers)
+        if (url.endsWith(PLAY_VIEW_UNITE_API)) {
             if ((Utils.isPink() || Utils.isPlay()) && Settings.TrialVipQuality() && !Accounts.isEffectiveVip)
                 pinNetworkType(NetworkType.WIFI, headers)
         }

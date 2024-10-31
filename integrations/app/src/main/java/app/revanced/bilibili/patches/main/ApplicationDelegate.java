@@ -53,7 +53,6 @@ import java.util.Objects;
 import app.revanced.bilibili.account.PassportChangeReceiver;
 import app.revanced.bilibili.patches.CustomThemePatch;
 import app.revanced.bilibili.patches.DpiPatch;
-import app.revanced.bilibili.patches.okhttp.BangumiSeasonHook;
 import app.revanced.bilibili.settings.Settings;
 import app.revanced.bilibili.utils.CrossProcessPreferences;
 import app.revanced.bilibili.utils.KtUtils;
@@ -61,7 +60,6 @@ import app.revanced.bilibili.utils.Logger;
 import app.revanced.bilibili.utils.Reflex;
 import app.revanced.bilibili.utils.SubtitleParamsCache;
 import app.revanced.bilibili.utils.Themes;
-import app.revanced.bilibili.utils.UposReplacer;
 import app.revanced.bilibili.utils.Utils;
 import app.revanced.bilibili.utils.Versions;
 import tv.danmaku.bili.MainActivityV2;
@@ -105,10 +103,7 @@ public abstract class ApplicationDelegate extends Application {
             Utils.async(ApplicationDelegate::startLog);
             SubtitleParamsCache.updateFont();
             KtUtils.getAreaTask();
-            UposReplacer.getBaseUposList();
             Themes.registerGarbChangeObserver();
-            Utils.async(500L, BangumiSeasonHook::injectExtraSearchTypes);
-            Utils.async(500L, BangumiSeasonHook::injectExtraSearchTypesV2);
             Utils.async(2000L, CouponAutoReceiver::check);
         }
         long end = System.currentTimeMillis();

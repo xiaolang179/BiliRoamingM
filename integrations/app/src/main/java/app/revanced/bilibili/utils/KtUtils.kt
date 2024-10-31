@@ -27,7 +27,6 @@ import app.revanced.bilibili.account.Accounts
 import app.revanced.bilibili.meta.Client
 import app.revanced.bilibili.meta.VideoHistory
 import app.revanced.bilibili.patches.main.ApplicationDelegate
-import app.revanced.bilibili.patches.okhttp.BangumiSeasonHook.seasonAreasCache
 import app.revanced.bilibili.settings.ModulePreferenceManager
 import app.revanced.bilibili.settings.Settings
 import com.bapis.bilibili.metadata.Metadata
@@ -556,26 +555,6 @@ val isChinaEnv: Boolean
         it.language == "zh" && (it.country == "CN" || it.script == "Hans")
     }
 
-fun getServerByArea(area: Area): String {
-    return when (area) {
-        Area.China -> Settings.ChinaServer()
-        Area.HongKong -> Settings.HongKongServer()
-        Area.TaiWan -> Settings.TaiWanServer()
-        Area.Thailand -> Settings.ThailandServer()
-        else -> ""
-    }
-}
-
-fun getExtraSearchByType(type: String): Boolean {
-    if (type.isEmpty())
-        return false
-    if ("bangumi" == type)
-        return Settings.SearchBangumi()
-    if ("movie" == type)
-        return Settings.SearchMovie()
-    return false
-}
-
 inline fun <reified T> systemService(): T {
     return Utils.getContext().getSystemService(T::class.java)
 }
@@ -765,14 +744,6 @@ val isAppArch64: Boolean
         .let { it == "arm64" || it == "x86_64" }
 
 val isPrebuilt inline get() = sigMd5() == Constants.PRE_BUILD_SIG_MD5
-
-fun maybeThailand(sid: String, epId: String = ""): Boolean {
-    val seasonAreasCache = seasonAreasCache
-    val epCacheId = "ep$epId"
-    return Area.Thailand.let { it == seasonAreasCache[sid] || it == seasonAreasCache[epCacheId] }
-            || cachePrefs.contains(sid) && Area.Thailand.value == cachePrefs.getString(sid, null)
-            || cachePrefs.contains(epCacheId) && Area.Thailand.value == cachePrefs.getString(epCacheId, null)
-}
 
 fun Date.format(pattern: String = "yyyy-MM-dd HH:mm:ss"): String {
     return SimpleDateFormat(pattern, Locale.getDefault()).format(this)

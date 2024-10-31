@@ -1,7 +1,6 @@
 package app.revanced.bilibili.patches.protobuf
 
 import app.revanced.bilibili.meta.HookFlags
-import app.revanced.bilibili.patches.protobuf.hooks.SearchByType
 import com.bilibili.lib.moss.api.MossException
 import com.google.protobuf.GeneratedMessageLite
 
@@ -12,7 +11,7 @@ import com.google.protobuf.GeneratedMessageLite
 abstract class MossHook<out Req : GeneratedMessageLite<*, *>, out Resp : GeneratedMessageLite<*, *>> {
 
     /**
-     * for some rare case, see [MossPatch.hookAsyncBefore] & [SearchByType].
+     * for some rare case, see [MossPatch.hookAsyncBefore].
      */
     open val async: Boolean = false
 

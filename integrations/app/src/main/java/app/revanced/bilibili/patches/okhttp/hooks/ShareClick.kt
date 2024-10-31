@@ -28,13 +28,13 @@ object ShareClick : ApiHook() {
 
     override fun shouldHook(url: String, status: Int): Boolean {
         return status.isOk && url.contains("/x/share/click")
-                && (Settings.UnlockAreaLimit() || Settings.PurifyShare() || Settings.FuckMiniProgram())
+                && (Settings.PurifyShare() || Settings.FuckMiniProgram())
     }
 
     override fun hook(url: String, status: Int, request: String, response: String): String {
         val json = response.toJSONObject()
         val code = json.optInt("code", -1)
-        if (Settings.UnlockAreaLimit() && code != 0) {
+        if (code != 0) {
             val formBody = decodeFormBody(request)
             val shareOrigin = formBody["share_origin"]
             val shareChannel = formBody["share_channel"]

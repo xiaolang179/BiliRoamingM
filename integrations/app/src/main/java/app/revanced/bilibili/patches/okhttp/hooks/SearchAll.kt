@@ -1,7 +1,6 @@
 package app.revanced.bilibili.patches.okhttp.hooks
 
 import app.revanced.bilibili.patches.okhttp.ApiHook
-import app.revanced.bilibili.patches.okhttp.BangumiSeasonHook
 import app.revanced.bilibili.settings.Settings
 import org.json.JSONObject
 
@@ -17,9 +16,6 @@ object SearchAll : ApiHook() {
     override fun hook(url: String, status: Int, request: String, response: String): String {
         val jsonObject = JSONObject(response)
         if (jsonObject.optInt("code") == 0) {
-            val data = jsonObject.optJSONObject("data")
-                ?: return response
-            BangumiSeasonHook.addAreaTagsForHd(data)
             return jsonObject.toString()
         }
         return response

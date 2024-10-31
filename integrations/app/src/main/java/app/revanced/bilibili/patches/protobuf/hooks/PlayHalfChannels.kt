@@ -3,7 +3,6 @@ package app.revanced.bilibili.patches.protobuf.hooks
 import app.revanced.bilibili.patches.protobuf.MossHook
 import app.revanced.bilibili.settings.Settings
 import app.revanced.bilibili.utils.Versions
-import app.revanced.bilibili.utils.maybeThailand
 import com.bapis.bilibili.app.playerunite.v1.PlayHalfChannelsReply
 import com.bapis.bilibili.app.playerunite.v1.PlayHalfChannelsReq
 import com.bapis.bilibili.playershared.*
@@ -16,14 +15,7 @@ object PlayHalfChannels : MossHook<PlayHalfChannelsReq, PlayHalfChannelsReply>()
     }
 
     private fun shouldReconstruct(req: PlayHalfChannelsReq, reply: PlayHalfChannelsReply?): Pair<Boolean, Boolean> {
-        if (!Settings.UnlockAreaLimit())
-            return false to false
-        val epId = req.extraContentMap["epid"]
-            ?: return false to false
-        val seasonId = req.aid.toString()
-        if (maybeThailand(seasonId, epId))
-            return true to true
-        else if (reply == null || reply == PlayHalfChannelsReply.getDefaultInstance())
+        if (reply == null || reply == PlayHalfChannelsReply.getDefaultInstance())
             return true to false
         return false to false
     }
@@ -35,7 +27,7 @@ object PlayHalfChannels : MossHook<PlayHalfChannelsReq, PlayHalfChannelsReply>()
     ): PlayHalfChannelsReply? {
         val (reconstruct, thailand) = shouldReconstruct(req, reply)
         if (!reconstruct) {
-            if (reply != null && (Settings.UnlockPlayLimit() || Settings.AllowDownload())) {
+            if (reply != null && (Settings.UnlockPlayLimit())) {
                 reply.groupsList.asSequence().flatMap { it.itemsList }.forEach {
                     val type = it.base.type
                     if (Settings.UnlockPlayLimit()) {
@@ -50,7 +42,7 @@ object PlayHalfChannels : MossHook<PlayHalfChannelsReq, PlayHalfChannelsReply>()
                                 it.style = SettingItemStyle.SETTING_STYLE_SWITCH
                         }
                     }
-                    if (Settings.AllowDownload() && type == SettingItemType.SETTING_DOWNlOAD) {
+                    if (type == SettingItemType.SETTING_DOWNlOAD) {
                         it.base.control = SettingControl()
                         it.clearMore()
                     }

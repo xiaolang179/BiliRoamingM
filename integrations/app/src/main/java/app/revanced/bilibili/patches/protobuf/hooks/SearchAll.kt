@@ -1,6 +1,5 @@
 package app.revanced.bilibili.patches.protobuf.hooks
 
-import app.revanced.bilibili.patches.okhttp.BangumiSeasonHook
 import app.revanced.bilibili.patches.protobuf.MossHook
 import app.revanced.bilibili.settings.Settings
 import app.revanced.bilibili.utils.ArrayUtils
@@ -43,7 +42,6 @@ object SearchAll : MossHook<SearchAllRequest, SearchAllResponse>() {
         error: MossException?
     ): SearchAllResponse? {
         if (reply != null) {
-            BangumiSeasonHook.addAreaTags(reply)
             filterSearchResult(reply)
         }
         return super.hookAfter(req, reply, error)

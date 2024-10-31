@@ -5,7 +5,6 @@ import android.util.Pair
 import app.revanced.bilibili.patches.okhttp.ApiHook
 import app.revanced.bilibili.settings.Settings
 import app.revanced.bilibili.utils.*
-import app.revanced.bilibili.utils.UposReplacer.isGotchaLiveCdn
 import org.json.JSONObject
 import kotlin.math.abs
 
@@ -65,34 +64,6 @@ object RoomPlayInfo : ApiHook() {
                             Logger.debug { "RoomPlayInfo, best codec: $best" }
                             codecList?.removeIf { it != best }
                         }
-                }
-            }
-    }
-
-    private fun preferStableCdn(json: JSONObject) {
-        json.optJSONObject("data")?.optJSONObject("playurl_info")
-            ?.optJSONObject("playurl")?.optJSONArray("stream")
-            .orEmpty().asSequence<JSONObject>().flatMap { s ->
-                s.optJSONArray("format").orEmpty().asSequence<JSONObject>().flatMap { f ->
-                    f.optJSONArray("codec").orEmpty().asSequence<JSONObject>()
-                }
-            }.forEach { codec ->
-                val urlInfoList = codec.optJSONArray("url_info")
-                if (!urlInfoList.isNullOrEmpty() && urlInfoList.length() > 1) {
-                    val first = urlInfoList.optJSONObject(0)
-                    val firstHost = first?.optString("host").orEmpty()
-                    if (!firstHost.isGotchaLiveCdn()) {
-                        urlInfoList.asSequence<JSONObject>().firstNotNullOfOrNull { info ->
-                            val host = info.optString("host")
-                            if (host.isGotchaLiveCdn()) {
-                                info to host
-                            } else null
-                        }?.let { (gotchaInfo, gotchaHost) ->
-                            first.put("host", gotchaHost)
-                            gotchaInfo.put("host", firstHost)
-                            Logger.debug { "RoomPlayInfo, prefer gotcha cdn: $gotchaHost" }
-                        }
-                    }
                 }
             }
     }

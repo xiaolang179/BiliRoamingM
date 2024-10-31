@@ -22,9 +22,7 @@ object GrpcPlayViewUnite : BaseFakeClientGrpcHook() {
     }
 
     override fun hookBefore(url: String, headers: Array<String>): Pair<String, Array<String>> {
-        val newHeaders = if (Settings.UnlockAreaLimit() && Utils.isPlay()) {
-            super.hookBefore(url, headers).second
-        } else headers
+        val newHeaders = headers
         val authIndex = newHeaders.indexOfFirst { it == "authorization" }
         if (authIndex != -1)
             newHeaders[authIndex + 1] = "identify_v1 ${getFinalAccessKey(false)}"

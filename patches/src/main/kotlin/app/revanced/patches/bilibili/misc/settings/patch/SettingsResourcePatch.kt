@@ -47,7 +47,6 @@ object SettingsResourcePatch : ResourcePatch() {
         "biliroaming_setting_customize_player.xml",
         "biliroaming_setting_customize_video_detail.xml",
         "biliroaming_setting_customize_space.xml",
-        "biliroaming_setting_unlock_area_limit.xml",
         "biliroaming_setting_upos.xml",
         "biliroaming_setting_space.xml",
         "biliroaming_setting_customize_search.xml",

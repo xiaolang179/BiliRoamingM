@@ -14,7 +14,7 @@ object ShareChannels : ApiHook() {
 
     override fun shouldHook(url: String, status: Int): Boolean {
         // start from 7.38.0, switched to bson and gson type adapter, so hook response directly
-        return (Settings.UnlockPlayLimit() || Settings.UnlockAreaLimit())
+        return (Settings.UnlockPlayLimit())
                 && url.contains("/x/share/channels")
                 && status.isOk
     }

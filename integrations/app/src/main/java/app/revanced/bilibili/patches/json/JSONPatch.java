@@ -188,10 +188,6 @@ public class JSONPatch {
             customizeHomeTab(tabResponse.tabData);
         } else if (data instanceof BiliSpace biliSpace) {
             customizeSpace(biliSpace);
-        } else if (data instanceof OgvApiResponse<?> ogvApiResponse) {
-            unlockOgvResponse(ogvApiResponse);
-        } else if (!Utils.isHd() && data instanceof OgvApiResponseV2 ogvApiResponseV2) {
-            unlockOgvResponseV2(ogvApiResponseV2);
         } else if (data instanceof StoryFeedResponse feedResponse) {
             PegasusPatch.filterStory(feedResponse);
         } else if (data instanceof EventSplashDataList splashList) {
@@ -563,25 +559,5 @@ public class JSONPatch {
             }
         } catch (NoSuchFieldError ignored) {
         }
-    }
-
-    private static void unlockOgvResponse(OgvApiResponse<?> response) {
-        if (!Settings.AllowDownload.get()) return;
-        if (!(response.result instanceof List<?> items)) return;
-        for (int i = 0; i < items.size(); i++) {
-            Object item = items.get(i);
-            if (item instanceof EpPlayable epPlayable)
-                epPlayable.isPlayable = 1;
-        }
-    }
-
-    private static void unlockOgvResponseV2(OgvApiResponseV2 response) {
-        if (!Settings.AllowDownload.get()) return;
-        var data = response.getData();
-        if (data == null) return;
-        var params = data.getEpPlayableParams();
-        if (params == null || params.isEmpty()) return;
-        for (int i = 0; i < params.size(); i++)
-            params.get(i).setPlayableType(0);
     }
 }

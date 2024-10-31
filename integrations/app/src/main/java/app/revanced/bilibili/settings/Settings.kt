@@ -9,20 +9,6 @@ object Settings {
     @JvmField val ShowHint = BooleanSetting(key = "show_hint")
 
 
-    // region Group: 解锁番剧限制
-    @JvmField val UnlockAreaLimit = BooleanSetting(key = "main_func")
-    @JvmField val AllowDownload = BooleanSetting(key = "allow_download", dependency = UnlockAreaLimit)
-    @JvmField val AllowMiniPlay = BooleanSetting(key = "allow_mini_play")
-    @JvmField val TaiWanServer = StringSetting(key = "tw_server")
-    @JvmField val HongKongServer = StringSetting(key = "hk_server")
-    @JvmField val ChinaServer = StringSetting(key = "cn_server")
-    @JvmField val ThailandServer = StringSetting(key = "th_server")
-    @JvmField val UposHost = StringSetting(key = "upos_host")
-    @JvmField val SaveThailandHistory =
-        BooleanSetting(key = "save_th_history", defValue = true, dependency = UnlockAreaLimit)
-    // endregion
-
-
     // region Group: 播放器
     @JvmField val HalfScreenQuality = StringSetting(key = "half_screen_quality", defValue = "0")
     @JvmField val FullScreenQuality = StringSetting(key = "full_screen_quality", defValue = "0")
@@ -192,10 +178,8 @@ object Settings {
 
 
     // region Group: 用户空间页
-    @JvmField val FixSpace = BooleanSetting(key = "fix_space", defValue = true)
     @JvmField val CustomizeSpace = StringSetSetting(key = "customize_space")
     @JvmField val AddArticleTab = BooleanSetting(key = "add_article_tab")
-    @JvmField val IgnoreBlacklist = BooleanSetting(key = "ignore_blacklist")
     @JvmField val UidCopyNoPrefix = BooleanSetting(key = "uid_copy_no_prefix")
     // endregion
 

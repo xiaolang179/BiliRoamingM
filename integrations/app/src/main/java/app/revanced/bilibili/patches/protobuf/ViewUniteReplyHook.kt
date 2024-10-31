@@ -1,15 +1,9 @@
 package app.revanced.bilibili.patches.protobuf
 
 import android.util.Pair
-import app.revanced.bilibili.api.BiliRoamingApi.getSeason
 import app.revanced.bilibili.patches.AutoLikePatch
 import app.revanced.bilibili.patches.BLRoutePatch
 import app.revanced.bilibili.patches.json.PegasusPatch
-import app.revanced.bilibili.patches.main.VideoInfoHolder
-import app.revanced.bilibili.patches.okhttp.BangumiSeasonHook.FAIL_CODE
-import app.revanced.bilibili.patches.okhttp.BangumiSeasonHook.bangumiInfoCache
-import app.revanced.bilibili.patches.okhttp.BangumiSeasonHook.isBangumiWithWatchPermission
-import app.revanced.bilibili.patches.okhttp.EpisodeInfo
 import app.revanced.bilibili.settings.Settings
 import app.revanced.bilibili.utils.*
 import com.bapis.bilibili.app.viewunite.common.*
@@ -42,17 +36,10 @@ object ViewUniteReplyHook {
                 AutoLikePatch.autoLikeUnite()
             if (Settings.RemoveChargeButton())
                 viewReply.reqUser.clearElecPlusBtn()
-            hookArc(viewReply)
             hookTabModules(viewReply)
             hookSupplement(viewReply)
             hookViewConfig(viewReply.viewBase.config)
         }
-        if (Settings.UnlockAreaLimit()
-            && (viewReply == null || viewReply == ViewReply.getDefaultInstance())
-            && viewReq.extraContentMap.let {
-                it.containsKey("season_id") || it.containsKey("ep_id")
-            }
-        ) return unlockThaiBangumi(viewReq)
         if (error != null) throw error else return viewReply
     }
 
@@ -74,15 +61,6 @@ object ViewUniteReplyHook {
         }
     }
 
-    private fun hookArc(viewReply: ViewReply) {
-        if (Settings.AllowDownload()) {
-            viewReply.arc.right.run {
-                download = true
-                onlyVipDownload = false
-            }
-        }
-    }
-
     private fun hookSupplement(viewReply: ViewReply) {
         val supplementAny = viewReply.supplement
         if (supplementAny.typeUrl == VIEW_UGC_ANY_TYPE_URL) {
@@ -100,20 +78,6 @@ object ViewUniteReplyHook {
             return
         val viewPgcAny = ViewPgcAny.parseFrom(supplementAny.value)
         if (!viewPgcAny.hasOgvData()) return
-        viewPgcAny.ogvData.run {
-            rights.run {
-                if (Settings.UnlockAreaLimit()) {
-                    areaLimit = 0
-                    banAreaShow = 1
-                    canWatch = 1
-                }
-                if (Settings.AllowDownload()) {
-                    allowDownload = 1
-                    newAllowDownload = 1
-                    onlyVipDownload = 0
-                }
-            }
-        }
         val newSupplement = newAny(VIEW_PGC_ANY_TYPE_URL, viewPgcAny)
         viewReply.supplement = newSupplement
     }
@@ -170,70 +134,6 @@ object ViewUniteReplyHook {
                 text = if (status == 13) "会员" else ""
             }
         }
-        rights.run {
-            if (Settings.UnlockAreaLimit()) {
-                areaLimit = 0
-                canWatch = 1
-                allowDm = 1
-            }
-            if (Settings.AllowDownload()) {
-                allowDownload = 1
-            }
-        }
-    }
-
-    private fun unlockThaiBangumi(viewReq: ViewReq): ViewReply? {
-        val extraContent = viewReq.extraContentMap
-        val epId = extraContent.getOrDefault("ep_id", "0").toLong()
-        val seasonId = extraContent.getOrDefault("season_id", "0")
-            .toLong().takeIf { it != 0L } ?: bangumiInfoCache.firstNotNullOfOrNull {
-            if (it.value.keys.contains(epId)) it.key else null
-        } ?: VideoInfoHolder.currentSeason()?.id ?: 0L
-        val (newCode, newResult) = getSeason(seasonId, epId)?.toJSONObject()?.let {
-            it.optInt("code", FAIL_CODE) to it.optJSONObject("result")
-        } ?: (FAIL_CODE to null)
-        Logger.debug { "unlockThaiBangumi, newCode: $newCode, newResult: $newResult" }
-        if (isBangumiWithWatchPermission(newResult, newCode)) {
-            return runCatching {
-                val th = newResult.optString("link").startsWith("https://www.bilibili.tv")
-                ViewReply().apply {
-                    supplement = newAny(VIEW_PGC_ANY_TYPE_URL, ViewPgcAny().apply {
-                        ogvData = reconstructOgvData(newResult)
-                    })
-                    tab = Tab().apply {
-                        TabModule().apply {
-                            tabType = TabType.TAB_INTRODUCTION
-                            introduction = reconstructIntroduction(newResult, th)
-                        }.let { addTabModule(it) }
-                        if (!th && !Settings.BlockVideoComment()) {
-                            TabModule().apply {
-                                tabType = TabType.TAB_REPLY
-                                reply = ReplyTab().apply { title = "评论" }
-                            }.let { addTabModule(it) }
-                        }
-                    }
-                    viewBase = ViewBase().apply {
-                        bizType = BizType.BIZ_TYPE_PGC
-                        config = Config().apply {
-                            hookViewConfig(this)
-                            if (!th) online = Online().apply {
-                                onlineShow = true
-                            }
-                        }
-                        control = PageControl().apply {
-                            materialShow = Control()
-                            toastShow = Control()
-                            upShow = Control()
-                        }
-                    }
-                }
-            }.onFailure {
-                Logger.error(it) { "unlockThaiBangumi, failed to reconstruct unite view" }
-            }.onSuccess {
-                Logger.debug { "unlockThaiBangumi, reconstruct view: $it" }
-            }.getOrNull()
-        }
-        return null
     }
 
     private fun reconstructOgvData(result: JSONObject) = OgvData().apply {
@@ -296,16 +196,6 @@ object ViewUniteReplyHook {
                 forbidPre = optInt("forbid_pre")
                 isPreview = optInt("is_preview")
                 onlyVipDownload = optInt("only_vip_download")
-                if (Settings.UnlockAreaLimit()) {
-                    areaLimit = 0
-                    banAreaShow = 1
-                    canWatch = 1
-                }
-                if (Settings.AllowDownload()) {
-                    allowDownload = 1
-                    newAllowDownload = 1
-                    onlyVipDownload = 0
-                }
             }
         }
         seasonId = result.optLong("season_id")
@@ -525,10 +415,6 @@ object ViewUniteReplyHook {
                         allowDownload = optInt("allow_download")
                         areaLimit = optInt("area_limit")
                     }
-                    if (Settings.UnlockAreaLimit())
-                        areaLimit = 0
-                    if (Settings.AllowDownload())
-                        allowDownload = 1
                 }
                 sectionIndex = episode.optInt("section_index")
                 shareCopy = episode.optString("share_copy")
@@ -562,15 +448,6 @@ object ViewUniteReplyHook {
                 title = episode.optString("title")
                 vid = episode.optString("vid")
             }.let { addEpisodes(it) }
-
-            if (episode.has("ep_id")) {
-                val epId = episode.optLong("ep_id")
-                val subtitles = episode.optJSONArray("subtitles")
-                val clipInfo = episode.optJSONObject("jump")
-                bangumiInfoCache.compute(seasonId) { _, v ->
-                    (v ?: hashMapOf()).apply { this[epId] = EpisodeInfo(subtitles, clipInfo) }
-                }
-            }
         }
     }
 }
