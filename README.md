@@ -46,7 +46,6 @@ cd BiliRoamingM
 
 ## ⬇️ 下载使用
 
-- 前往 [BiliRoamingM-PreBuilds Release](https://github.com/sakarie9/BiliRoamingM-PreBuilds/releases/latest) 下载
 - 参照 [revanced-cli](https://github.com/ReVanced/revanced-cli/tree/main/docs) 文档打包
   1. 下载定制版 [revanced-cli.jar](https://github.com/zjns/revanced-cli/releases/latest)
   2. 从 [releases](https://github.com/sakarie9/BiliRoamingM/releases/latest) 下载 `integrations.apk` 和 `patches.jar`
