@@ -7,5 +7,6 @@ object ResponseFingerprint : MethodFingerprint(
     strings = listOf("Response{protocol="),
     customFingerprint = { _, classDef ->
         classDef.interfaces == listOf("Ljava/io/Closeable;") && classDef.methods.none { it.accessFlags.isNative() }
+                && classDef.toString() != "Lcom/tencent/cloud/ai/network/okhttp3/Response;"
     }
 )
