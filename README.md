@@ -1,21 +1,20 @@
-<div align="center">
-
 # 哔哩漫游M
 
-</div>
-
-> [!IMPORTANT]  
+> [!IMPORTANT]
+>
 > 基于 [BiliRoamingX](https://github.com/BiliRoamingX/BiliRoamingX)，去除番剧解锁、大会员画质试用等功能
 >
 > 此 Fork 针对 Play 版本测试，仅进行维护性更新。
 
-> [!NOTE]  
-> **不提供** 预编译包
+> [!NOTE]
+>
+> **不提供** 预构建包
 >
 > **请勿在公开场合分享**，随时跑路
 
 > [!IMPORTANT]
-> ```
+>
+> ```plain
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 > IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 > FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
