@@ -27,7 +27,6 @@ object CopyEnhancePatch : MultiMethodBytecodePatch(
         CommentCopyNewFingerprint,
         Comment3CopyFingerprint,
         Comment3DialogCopyFingerprint,
-        ConversationCopyFingerprint,
     ),
     multiFingerprints = setOf(DescCopyFingerprint)
 ) {
@@ -96,21 +95,6 @@ object CopyEnhancePatch : MultiMethodBytecodePatch(
                 )
             }
         }
-        ConversationCopyFingerprint.result?.mutableMethod?.addInstructionsWithLabels(
-            0, """
-            move-object/from16 v0, p8
-            invoke-virtual {v0, p1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
-            move-result v0
-            if-eqz v0, :jump
-            move-object/from16 v0, p7
-            invoke-static {p0, p2, v0}, Lapp/revanced/bilibili/patches/CopyEnhancePatch;->onConversationCopy(Landroid/app/Activity;Lcom/bilibili/bplus/im/business/model/BaseTypedMessage;Landroid/widget/PopupWindow;)Z
-            move-result v0
-            if-eqz v0, :jump
-            return-void
-            :jump
-            nop
-        """.trimIndent()
-        ) ?: throw ConversationCopyFingerprint.exception
         Comment3DialogCopyFingerprint.result?.run {
             mutableMethod.cloneMutable(registerCount = 3, clearImplementation = true).apply {
                 mutableMethod.name += "_Origin"
