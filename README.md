@@ -61,6 +61,10 @@ cd BiliRoamingM
   2. 从 [releases](https://github.com/sakarie9/BiliRoamingM/releases/latest) 下载 `integrations.apk` 和 `patches.jar`
   3. 执行终端命令 `java -jar revanced-cli.jar patch --merge integrations.apk --patch-bundle patches.jar --signing-levels 1,2,3 bilibili.apk`
 
+> [!NOTE]
+>
+> 若获取到的 Bilibili 为 apkm, xapk 或 apks 等格式，需要使用 [APKEditor](https://github.com/REAndroid/APKEditor) 等工具将其合并为 apk 再执行上述打包命令。
+
 ## 📃 Licence
 
 [![GitHub](https://img.shields.io/github/license/sakarie9/BiliRoamingM?style=for-the-badge)](https://github.com/sakarie9/BiliRoamingM/blob/main/LICENSE)
